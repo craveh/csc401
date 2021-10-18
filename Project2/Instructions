@@ -1,0 +1,26 @@
+
+CSC401 Fall 2021 
+Instructor: Odelia Schwartz 
+TA: Alexandros Kahn 
+Project 2 
+ 
+September 23, 2021 (due October 22, 2021 by midnight, on Blackboard).  
+ 
+Do an algorithm animation of Randomize-In-Place (we discussed in CSC317 class; see 
+pseudocode in CLRS book, Chapter 5, p 126): 
+ 
+RANDOMIZE-IN-PLACE(A) 
+1. n=A.length 
+2. for i = 1 to n 
+3.      swap A[i] with A[Random(i,n)] 
+ 
+The algorithm should display the pseudocode and line by line highlighting through the code, 
+along with the resulting array. Test your algorithm to see that it works as you expect it to. For an 
+example of an algorithm animation (which is different than the above assignment, but shows a 
+full example of implementing an animation of another algorithm we learned in class), see 
+Partition Algorithm Animation: 
+(http://www.cs.miami.edu/~burt/learning/Csc517.101/workbook/partition.html). Feel free to 
+modify the style of your animation to your liking. 
+ 
+Submit all your files (e.g., the html files and any auxiliary files), or a link to your website (e.g., 
+GitHub), through Blackboard. 
