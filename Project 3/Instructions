@@ -1,0 +1,18 @@
+CSC401 Fall 2021 
+Instructor: Odelia Schwartz 
+TA: Alexandros Kahn 
+Project 3 
+ 
+October 26, 2021 (due December 8, 2021 by midnight, on Blackboard).  
+ 
+Implement a double hashing animation. See linear probing example: 
+http://www.cs.miami.edu/home/burt/learning/Csc517.101/workbook/hashing_linear.html  
+Make the table size 16. Set the first hash function as: 𝐻1 = 𝑘𝑒𝑦 𝑚𝑜𝑑 16; and the second hash 
+function as: 𝐻2 = 2 (𝑘𝑒𝑦 𝑚𝑜𝑑 4)   +  1. Try to illustrate the collisions and skips to new slots in 
+the table. Recall: In double hashing, the slot is determined by (𝐻1  +  𝑖 𝐻2) 𝑚𝑜𝑑 16, in which 
+𝐻1 is the first hash function and 𝐻2 is the second hash function. Here 𝑖 multiplies 𝐻2, and 
+initially 𝑖 is set to 0; then if there is a collision we set 𝑖 to 1; then if there is still a collision we set 
+𝑖 to 2; and so on. 
+ 
+Submit all your files (e.g., the html files and any auxiliary files), or a link to your website (e.g., 
+GitHub), through Blackboard. 
