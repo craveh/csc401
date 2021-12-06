@@ -2,12 +2,12 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<title>Randomize-In-Place</title>
+<title>Hashing: Double Hashing</title>
 <!--
 <script type="text/javascript" src="myjavascript.js"></script>
 <link href="course.css" rel="stylesheet" type="text/css">
 -->
-<style type="text/css"><!-- 
+<style type="text/css"><!--
    /* internal styles */
 body {
    font-family: "Trebuchet MS", Skia, "Lucida Sans Unicode", sans-serif;
@@ -52,55 +52,68 @@ a {
    text-decoration: none ;
 }
 
-.mybox {
-   border: 3px #369;
-   border-style: solid solid ;
-   padding: 1.5em ;
-   margin: 2em 0 ;
-}
-
 .prebox {
-   padding: 1em ;
    background: #ffc; 
    overflow: scroll; 
 }
 
-.arraytext {
+.prebox span {
+   background: #fcc ;
+}
+
+
+.bucketnumber {
+   margin-top: 4.5em; 
+   text-align: center;
+   color: #555 ;
+}
+
+.buckettext {
    float: left; 
    text-align: center; 
    width: 100%; 
-   margin-top: .5em ;
+   margin-top: 1em ;
    font-size: 1.5em ;
 }
 
-.arraycell {
-	float: left;
-	width: 3em ;
-	height: 3em ;
-	background: #999 ;
+.bucketbox {
+   float: left; width: 4em; height: 4em;
+}
+
+#hashtablecontainer {
+   height: 8em ;
 }
 
 --></style>
 
 <script type="text/javascript">
 
-			
-var cb_color  = "#ffc" ; //code background
-var cbh_color = "#faa" ; //code background highlight
-
-var algStep_g ;
 
 
-function createArray(n) {
-   var i ;
-   a = new Array(n) ;
-   for ( i=0; i<n; i++ ) a[i] = i ;
-   return a ;
-}
+var TABLE_SIZE = 16 ;
+var numElementsInTable = 0;
 
-function stepZero() { 
-    initElement() ; 
-}
+var bucketcolor = new Array(
+	'#8ff', 
+	'#ff8',
+	'#dca',
+	'#f88',
+	'#8ff', 
+	'#ff8',
+	'#dca',
+	'#f88',
+	'#8ff', 
+	'#ff8',
+	'#dca',
+	'#f88',
+	'#8ff', 
+	'#ff8',
+	'#dca',
+	'#f88'
+	
+	
+	
+	);
 
 function setElementValue(elementId, value) {
 	if ( document.getElementById(elementId).innerText!=undefined ) {
@@ -110,91 +123,117 @@ function setElementValue(elementId, value) {
 	}
 }
 
-function initElement() {
-    a = createArray(16);
-	var i ;
-	for ( i=1; i<17;i++ ) {
-		document.getElementById('n'+i).style.background = "#ccf" ;
-		document.getElementById('n'+i).style.color = "black" ;
-		setElementValue('array'+i, a[i-1]) ;
-	}
-
-	algStep_g = 0 ;
-
-	setCodeColors(0) ;
-}
-
 function setCellColor(cell, color) {
-	document.getElementById('n'+cell).style.background = color ;
+	document.getElementById(cell).style.background = color ;
 }
 
-function Random(i, n){
-    return (Math.floor( Math.random() *(n-i +1) + i));
+function makeBucketHTMLString(i) {
+	return '<div class="bucketbox" id="bb_'+i+'" style="background: '+bucketcolor[i]+';">'
+		+'<div id="bucket_'+i+'" class="buckettext"><'
+		+ '/div><div class="bucketnumber">'+i+'<'+'/div><'+'/div>' ;
 }
 
-function redrawArray() {
 
+function initElement() {
+	var el = document.getElementById("hashtablecontainer") ;
 	var i ;
-
-	for ( i=0; i<=algStep_g; i++ ) {
-		setCellColor(i+1,"#faa") ;
-	}
-	
-	for ( i=1; i<17; i++ ) {
-	    setElementValue('array'+i, a[i-1]) ;
+	for (i=0;i<TABLE_SIZE;i++ ) {
+		el.innerHTML = el.innerHTML + makeBucketHTMLString(i) ;
 	}
 }
+ 
+function setElementValue(elementId, value) {
+	if ( document.getElementById(elementId).innerText!=undefined ) {
+		document.getElementById(elementId).innerText = value ;
+	} else {
+		document.getElementById(elementId).textContent = value ;
+	}
+}
 
-function algStep() {
-    if(algStep_g == 15){
-        redrawArray();
-        unsetCodeColors();
-        return;
-    }
-    setCodeColors(1);
+function getElementValue(elementId) {
+	if ( document.getElementById(elementId).innerText!=undefined ) {
+		//window.alert("if statement" + document.getElementById(elementId).innerText );
+		return document.getElementById(elementId).innerText ;
+		
+	} else {
+		//window.alert("else statement" + document.getElementById(elementId).textContent );
+		return document.getElementById(elementId).textContent ;
+	}
+}
 
-    if(algStep_g == 14){
-        setCodeColors(2);
-        swap(14,15);
-        algStep_g++;
-        return;
-    }
-
-    var swapLocation = Random(algStep_g, 15);
-    //document.write(swapLocation);
-    //setCodeColors(2);
-    swap(algStep_g, swapLocation);
-
-    algStep_g++;
+function getFromBucket(b) {
+// check for IE or Gecko. This is Gecko only:
 	
+	var to_return = getElementValue('bucket_'+b);
+	//window.alert(to_return);
+	return to_return ;
 }
 
-function swap(loc1, loc2){
-    //window.alert(loc1 + "," + loc2);
-    var temp = a[loc2];
-    
-    a[loc2] = a[loc1];
-    a[loc1] = temp;
-    //document.write(a[loc1]);
-    setCodeColors(2);
-    redrawArray();
+function putToBucket(b,t) {
+// check for IE or Gecko. This is Gecko only:
+	setElementValue('bucket_'+b,t) ;
+	document.getElementById('bucket_'+b).style.color="#0a0" ;
+}
+
+function makeBucketsBlack() {
+	var i ;
+	for ( i=0;i<TABLE_SIZE;i++ )
+		document.getElementById('bucket_'+i).style.color="#000" ;
+}
+
+function colorBucketTouched(i) {
+	//window.alert("testing coloer buckettouched start");
+	document.getElementById('bucket_'+i).style.color="#a00" ;
+	//window.alert("testing coloer buckettouched end");
+}
+
+function clearInputValues() {
+	var i ;
+	for ( i=0;i<TABLE_SIZE;i++ ) {
+		putToBucket(i,"") ;
+	}
+}
+
+function calculateHash(to_insert, i){
+	var hash_one = to_insert%TABLE_SIZE ;
+	var hash_two = 2*(to_insert%4) + 1;
+	var hash = (hash_one + i*hash_two) % TABLE_SIZE;
+	return hash;
 
 }
 
-function setCodeColors(i) {
-    document.getElementById("codeloc0").style.background = cb_color ;
-	document.getElementById("codeloc1").style.background = cb_color ;
-	document.getElementById("codeloc2").style.background = cb_color ;
-    document.getElementById("codeloc"+i).style.background = cbh_color ;
+function hashTableInsert(j) {
+	if(numElementsInTable ==TABLE_SIZE){
+		//window.alert("condition met");
+		clearInputValues()
+	}
+	var i = 0 ;
+	var hash = calculateHash(j, i);
+	//window.alert(hash);
+	while ( getFromBucket(hash) != "" ) {
+		//window.alert("testing entering while loop");
+		colorBucketTouched(hash) ;
+		//window.alert("testing more");
+		i++ ;
+		hash = calculateHash(j, i);
+		//window.alert(hash);
+		if ( i>TABLE_SIZE ) break ;
+	}
+	//window.alert("testing");
+	putToBucket(hash,j) ;
+	numElementsInTable ++;
 }
 
-function unsetCodeColors(){
-    document.getElementById("codeloc0").style.background = cb_color ;
-	document.getElementById("codeloc1").style.background = cb_color ;
-	document.getElementById("codeloc2").style.background = cb_color ;
+
+function getInputValue() {
+    var s = document.getElementById('hashin').value ;
+	var j = parseInt(s) ;
+	makeBucketsBlack() ;
+	if ( !isNaN(j) ) {
+		hashTableInsert(j) ;
+	}
+	document.getElementById('hashin').value="" ;
 }
-
-
 </script>
 
 </head>
@@ -202,107 +241,58 @@ function unsetCodeColors(){
  
 <div id="header">
 <h1>
-Randomize-In-Place
+Hashing: Double Hashing
 </h1>
 </div>
 
 
-<p>
-This is an animation of the Randomize-In-Place algorithm found in CLRS chapter 5.
+<h2>
+Hashtable
+</h2>
 
-<div class="mybox">
+<div id="hashtablecontainer">
+<!-- left margin -->
+<div style="float: left; width: 2em;">&nbsp;</div>
+<!-- javascript will create buckets here -->
+<!--    background color for the buckets is described by entries in array bucketcolor -->
 
-<div id="array">
-<div class="arraycell" id="n1">
-<div id="array1" class="arraytext"></div>
 </div>
-<div class="arraycell" id="n2">
-<div id="array2" class="arraytext"></div>
-</div>
-<div class="arraycell" id="n3">
-<div id="array3" class="arraytext"></div>
-</div>
-<div class="arraycell" id="n4">
-<div id="array4" class="arraytext"></div>
-</div>
-<div class="arraycell" id="n5">
-<div id="array5" class="arraytext"></div>
-</div>
-<div class="arraycell" id="n6">
-<div id="array6" class="arraytext"></div>
-</div>
-<div class="arraycell" id="n7">
-<div id="array7" class="arraytext"></div>
-</div>
-<div class="arraycell" id="n8">
-<div id="array8" class="arraytext"></div>
-</div>
-<div class="arraycell" id="n9">
-<div id="array9" class="arraytext"></div>
-</div>
-<div class="arraycell" id="n10">
-<div id="array10" class="arraytext"></div>
-</div>
-<div class="arraycell" id="n11">
-<div id="array11" class="arraytext"></div>
-</div>
-<div class="arraycell" id="n12">
-<div id="array12" class="arraytext"></div>
-</div>
-<div class="arraycell" id="n13">
-<div id="array13" class="arraytext"></div>
-</div>
-<div class="arraycell" id="n14">
-<div id="array14" class="arraytext"></div>
-</div>
-<div class="arraycell" id="n15">
-<div id="array15" class="arraytext"></div>
-</div>
-<div class="arraycell" id="n16">
-<div id="array16" class="arraytext"></div>
-</div>
-</div>
+
+
+<h2>Input</h2>
 
 <!-- left margin -->
-<div style="clear: left;"></div>
-
-<p>
-<div class="prebox" style="width:30em;">
-PSEUDOCODE FOR Randomize In-Place (taken from CLR)
-<br>
-<br>
-Goal: Re-order the entire array randomly.
-<br>
-<br>
-Randomize-In-Place(A)
-<br>
-<br>
-<span id="codeloc0">
-n = A.length
-
-</span>
-<br>
-<span id="codeloc1">
-for i = 1 to n
-</span>
-<br>
-<span id="codeloc2">
-&nbsp;&nbsp;swap A[i] with A[Random(i,n)]
-</span>
-<br>
-
-</div>
+<div style="float: left; width: 2em;">&nbsp;</div>
 
 <table>
+
 <tr>
-<td style="border: solid red 2px; background: #eef;"
-onclick="stepZero()">&nbsp;Restart&nbsp;
-<td style="border: solid red 2px; background: #fee;"
-onclick="algStep()">&nbsp;Next&nbsp;
+<th style="background: #cfc; width: 10em;">Value
+<td><input type="text" id="hashin">
+<tr>
+<th style="border: solid red 2px; background: #eef;"
+onclick="getInputValue()">&nbsp;Enter&nbsp;
+<th style="border: solid red 2px; background: #eef;"
+onclick="clearInputValues()">&nbsp;Clear&nbsp;
 </table>
 
-</div>
-</div><!-- i do not know if i need this extra div close -->
+<h2>
+Overview
+</h2>
+
+<p>
+This animation demonstrates a hash table that utilizes double hashing. The first hash function is H1 = 
+key mod 16. The second hash function is H2 = 2*(key mod 4) + 1. Using the values of H1 and H2 we can map 
+to a slot in out table, we use the function (H1 + iH2) mod 16 to do this.
+
+<p>
+This animation demonstates a successful insertion with the color green, and indicates that a collision
+occurred when inserting using the color. 
+<p>
+Upon insertion while the table is at capacity, the table will clear and then the key will
+be inserted. This hash table also allows for duplicate key values.
+</p>
+
 
 
 </body>
